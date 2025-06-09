@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Video Maker AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Welcome to My Video Maker AI</h1>
+    <h2>1. Play a Sample Video:</h2>
+    <video width="320" height="240" controls>
+      <source src="sample.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+
+    <h2>2. Describe Your Video Idea:</h2>
+    <form id="videoForm">
+      <input type="text" id="prompt" name="prompt" placeholder="E.g. A cat playing with a ball">
+      <button type="submit">Submit</button>
+    </form>
+
+    <h2>3. Upload Images for a Slideshow:</h2>
+    <input type="file" id="imageInput" multiple accept="image/*">
+    <div id="slideshow"></div>
+
+    <script>
+      // Handle form submit
+      document.getElementById('videoForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const prompt = document.getElementById('prompt').value;
+        alert('You entered: ' + prompt);
+      });
+
+      // Handle image upload
+      const imageInput = document.getElementById('imageInput');
+      const slideshow = document.getElementById('slideshow');
+
+      imageInput.addEventListener('change', (e) => {
+        slideshow.innerHTML = '';
+        const files = e.target.files;
+        for (let i = 0; i < files.length; i++) {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            const img = document.createElement('img');
+            img.src = event.target.result;
+            img.style.width = '200px';
+            img.style.margin = '10px';
+            slideshow.appendChild(img);
+          };
+          reader.readAsDataURL(files[i]);
+        }
+      });
+    </script>
+</body>
+</html>
