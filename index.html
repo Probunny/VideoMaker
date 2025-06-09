@@ -10,6 +10,11 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #f5f5f5;
       color: #333;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark-mode {
+      background: #121212;
+      color: #eee;
     }
     header {
       background: #0077ff;
@@ -24,6 +29,11 @@
       border-radius: 8px;
       padding: 20px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark-mode main {
+      background: #1e1e1e;
+      color: #eee;
     }
     h1, h2 {
       margin-top: 0;
@@ -68,12 +78,46 @@
       border-radius: 4px;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
+    .loader {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+    .loader.show {
+      display: block;
+    }
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #0077ff;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .toggle-dark {
+      background: none;
+      border: 2px solid white;
+      color: white;
+      padding: 5px 10px;
+      margin-top: 10px;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+    .toggle-dark:hover {
+      background: rgba(255,255,255,0.2);
+    }
   </style>
 </head>
 <body>
   <header>
     <h1>🎥 Video Maker AI</h1>
     <p>Create and preview videos from text or images!</p>
+    <button class="toggle-dark" id="darkModeToggle">Toggle Dark Mode</button>
   </header>
   <main>
     <section>
@@ -88,8 +132,19 @@
       <h2>2️⃣ Describe Your Video Idea</h2>
       <form id="videoForm">
         <input type="text" id="prompt" name="prompt" placeholder="e.g. A cat playing with a ball">
-        <button type="submit">Submit</button>
+        <button type="submit">Generate Video</button>
       </form>
+      <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <p>Generating video preview...</p>
+      </div>
+      <div id="generatedVideo" style="margin-top:20px; display:none;">
+        <h3>Your Generated Video Preview:</h3>
+        <video controls>
+          <source src="sample.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
     </section>
 
     <section>
@@ -100,11 +155,30 @@
   </main>
 
   <script>
-    // Handle text prompt submit
+    // Handle dark mode toggle
+    const darkToggle = document.getElementById('darkModeToggle');
+    darkToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+    });
+
+    // Handle form submit with spinner simulation
     document.getElementById('videoForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const prompt = document.getElementById('prompt').value;
-      alert('You entered: ' + prompt);
+      if (!prompt.trim()) {
+        alert("Please enter a video description.");
+        return;
+      }
+      const loader = document.getElementById('loader');
+      const generatedVideo = document.getElementById('generatedVideo');
+      loader.classList.add('show');
+      generatedVideo.style.display = 'none';
+
+      // Simulate AI video generation
+      setTimeout(() => {
+        loader.classList.remove('show');
+        generatedVideo.style.display = 'block';
+      }, 3000); // 3 seconds simulation
     });
 
     // Handle image uploads and preview
