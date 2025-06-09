@@ -1,31 +1,45 @@
-// /api/generate-video.js
+import OpenAI from "openai";
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
   }
 
   const { prompt, apiKey } = req.body;
 
   if (!prompt || !apiKey) {
-    return res.status(400).json({ error: 'Missing prompt or API key.' });
+    res.setHeader('Content-Type', 'application/json');
+    return res.status(400).json({ success: false, error: 'Missing prompt or API key.' });
   }
 
   try {
-    // Simulate a call to OpenAI (we can replace this with real API later)
-    // Example: const openai = new OpenAI(apiKey);
-    // const result = await openai.createVideo({ prompt });
-    console.log(`Prompt received: ${prompt}`);
-    console.log(`API key received: ${apiKey}`);
+    const openai = new OpenAI({ apiKey });
 
-    // Return a simulated success response
+    // Example: generate a script using OpenAI
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: "You are a helpful assistant that generates video scripts." },
+        { role: "user", content: `Generate a short video script based on this prompt: ${prompt}` }
+      ]
+    });
+
+    const script = completion.choices[0].message.content;
+
+    // For now, we’re not generating real videos—just simulate
+    res.setHeader('Content-Type', 'application/json');
     return res.status(200).json({
       success: true,
-      message: 'Simulated video generated successfully!'
+      videoUrl: "/sample.mp4", // Placeholder video URL
+      script
     });
   } catch (error) {
+    console.error("Server Error:", error);
+    res.setHeader('Content-Type', 'application/json');
     return res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message || 'Something went wrong.'
     });
   }
 }
