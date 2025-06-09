@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Video Maker AI</title>
   <style>
+    /* [Same CSS from before, plus minor additions:] */
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -35,17 +36,7 @@
       background: #1e1e1e;
       color: #eee;
     }
-    h1, h2 {
-      margin-top: 0;
-    }
-    video {
-      max-width: 100%;
-      border-radius: 8px;
-    }
-    form {
-      margin-top: 20px;
-    }
-    input[type="text"], input[type="file"] {
+    input[type="text"], input[type="password"], input[type="file"] {
       padding: 10px;
       width: 100%;
       box-sizing: border-box;
@@ -64,19 +55,6 @@
     }
     button:hover {
       background: #005bbb;
-    }
-    .slideshow {
-      display: flex;
-      flex-wrap: wrap;
-      margin-top: 20px;
-      gap: 10px;
-    }
-    .slideshow img {
-      width: 150px;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 4px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
     }
     .loader {
       display: none;
@@ -99,33 +77,18 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    .toggle-dark {
-      background: none;
-      border: 2px solid white;
-      color: white;
-      padding: 5px 10px;
-      margin-top: 10px;
-      border-radius: 20px;
-      cursor: pointer;
-    }
-    .toggle-dark:hover {
-      background: rgba(255,255,255,0.2);
-    }
   </style>
 </head>
 <body>
   <header>
     <h1>🎥 Video Maker AI</h1>
     <p>Create and preview videos from text or images!</p>
-    <button class="toggle-dark" id="darkModeToggle">Toggle Dark Mode</button>
   </header>
   <main>
     <section>
-      <h2>1️⃣ Sample Video Player</h2>
-      <video controls>
-        <source src="sample.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-      </video>
+      <h2>🔑 Enter Your API Key</h2>
+      <input type="password" id="apiKeyInput" placeholder="Enter your OpenAI API key here" />
+      <button id="saveApiKey">Save API Key</button>
     </section>
 
     <section>
@@ -146,27 +109,37 @@
         </video>
       </div>
     </section>
-
-    <section>
-      <h2>3️⃣ Upload Images for a Slideshow</h2>
-      <input type="file" id="imageInput" multiple accept="image/*">
-      <div class="slideshow" id="slideshow"></div>
-    </section>
   </main>
 
   <script>
-    // Handle dark mode toggle
-    const darkToggle = document.getElementById('darkModeToggle');
-    darkToggle.addEventListener('click', () => {
-      document.body.classList.toggle('dark-mode');
+    // Save API Key to localStorage
+    const saveApiKeyButton = document.getElementById('saveApiKey');
+    const apiKeyInput = document.getElementById('apiKeyInput');
+    saveApiKeyButton.addEventListener('click', () => {
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) {
+        alert("Please enter a valid API key.");
+        return;
+      }
+      localStorage.setItem('apiKey', apiKey);
+      alert("API key saved locally!");
     });
 
-    // Handle form submit with spinner simulation
-    document.getElementById('videoForm').addEventListener('submit', function(e) {
+    // Load API Key from localStorage on page load
+    window.addEventListener('load', () => {
+      const savedKey = localStorage.getItem('apiKey');
+      if (savedKey) {
+        apiKeyInput.value = savedKey;
+      }
+    });
+
+    // Handle form submit
+    document.getElementById('videoForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-      const prompt = document.getElementById('prompt').value;
-      if (!prompt.trim()) {
-        alert("Please enter a video description.");
+      const prompt = document.getElementById('prompt').value.trim();
+      const apiKey = localStorage.getItem('apiKey');
+      if (!apiKey) {
+        alert("Please enter and save your API key first.");
         return;
       }
       const loader = document.getElementById('loader');
@@ -174,28 +147,25 @@
       loader.classList.add('show');
       generatedVideo.style.display = 'none';
 
-      // Simulate AI video generation
-      setTimeout(() => {
+      try {
+        // Call the backend (we'll build this next!)
+        const response = await fetch('/api/generate-video', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt, apiKey })
+        });
+        const data = await response.json();
+        if (data.success) {
+          // Show the sample video for now
+          loader.classList.remove('show');
+          generatedVideo.style.display = 'block';
+        } else {
+          loader.classList.remove('show');
+          alert("Failed to generate video: " + data.error);
+        }
+      } catch (err) {
         loader.classList.remove('show');
-        generatedVideo.style.display = 'block';
-      }, 3000); // 3 seconds simulation
-    });
-
-    // Handle image uploads and preview
-    const imageInput = document.getElementById('imageInput');
-    const slideshow = document.getElementById('slideshow');
-
-    imageInput.addEventListener('change', (e) => {
-      slideshow.innerHTML = '';
-      const files = e.target.files;
-      for (let i = 0; i < files.length; i++) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          const img = document.createElement('img');
-          img.src = event.target.result;
-          slideshow.appendChild(img);
-        };
-        reader.readAsDataURL(files[i]);
+        alert("Error: " + err.message);
       }
     });
   </script>
