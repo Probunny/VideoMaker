@@ -1,56 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Video Maker AI</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Video Maker AI</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+    header {
+      background: #0077ff;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    main {
+      max-width: 800px;
+      margin: 20px auto;
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      margin-top: 0;
+    }
+    video {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    form {
+      margin-top: 20px;
+    }
+    input[type="text"], input[type="file"] {
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      background: #0077ff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin-top: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #005bbb;
+    }
+    .slideshow {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      gap: 10px;
+    }
+    .slideshow img {
+      width: 150px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 4px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+  </style>
 </head>
 <body>
-    <h1>Welcome to My Video Maker AI</h1>
-    <h2>1. Play a Sample Video:</h2>
-    <video width="320" height="240" controls>
-      <source src="sample.mp4" type="video/mp4">
-      Your browser does not support the video tag.
-    </video>
+  <header>
+    <h1>🎥 Video Maker AI</h1>
+    <p>Create and preview videos from text or images!</p>
+  </header>
+  <main>
+    <section>
+      <h2>1️⃣ Sample Video Player</h2>
+      <video controls>
+        <source src="sample.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </section>
 
-    <h2>2. Describe Your Video Idea:</h2>
-    <form id="videoForm">
-      <input type="text" id="prompt" name="prompt" placeholder="E.g. A cat playing with a ball">
-      <button type="submit">Submit</button>
-    </form>
+    <section>
+      <h2>2️⃣ Describe Your Video Idea</h2>
+      <form id="videoForm">
+        <input type="text" id="prompt" name="prompt" placeholder="e.g. A cat playing with a ball">
+        <button type="submit">Submit</button>
+      </form>
+    </section>
 
-    <h2>3. Upload Images for a Slideshow:</h2>
-    <input type="file" id="imageInput" multiple accept="image/*">
-    <div id="slideshow"></div>
+    <section>
+      <h2>3️⃣ Upload Images for a Slideshow</h2>
+      <input type="file" id="imageInput" multiple accept="image/*">
+      <div class="slideshow" id="slideshow"></div>
+    </section>
+  </main>
 
-    <script>
-      // Handle form submit
-      document.getElementById('videoForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const prompt = document.getElementById('prompt').value;
-        alert('You entered: ' + prompt);
-      });
+  <script>
+    // Handle text prompt submit
+    document.getElementById('videoForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const prompt = document.getElementById('prompt').value;
+      alert('You entered: ' + prompt);
+    });
 
-      // Handle image upload
-      const imageInput = document.getElementById('imageInput');
-      const slideshow = document.getElementById('slideshow');
+    // Handle image uploads and preview
+    const imageInput = document.getElementById('imageInput');
+    const slideshow = document.getElementById('slideshow');
 
-      imageInput.addEventListener('change', (e) => {
-        slideshow.innerHTML = '';
-        const files = e.target.files;
-        for (let i = 0; i < files.length; i++) {
-          const reader = new FileReader();
-          reader.onload = function(event) {
-            const img = document.createElement('img');
-            img.src = event.target.result;
-            img.style.width = '200px';
-            img.style.margin = '10px';
-            slideshow.appendChild(img);
-          };
-          reader.readAsDataURL(files[i]);
-        }
-      });
-    </script>
+    imageInput.addEventListener('change', (e) => {
+      slideshow.innerHTML = '';
+      const files = e.target.files;
+      for (let i = 0; i < files.length; i++) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const img = document.createElement('img');
+          img.src = event.target.result;
+          slideshow.appendChild(img);
+        };
+        reader.readAsDataURL(files[i]);
+      }
+    });
+  </script>
 </body>
 </html>
